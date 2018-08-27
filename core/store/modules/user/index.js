@@ -1,8 +1,8 @@
 import actions from './actions'
 import getters from './getters'
 import mutations from './mutations'
-import EventBus from 'core/plugins/event-bus'
-import i18n from 'core/lib/i18n'
+import EventBus from '../../lib/event-bus'
+import i18n from '../../lib/i18n'
 import store from '../../'
 
 EventBus.$on('user-after-update', (event) => {
@@ -10,15 +10,15 @@ EventBus.$on('user-after-update', (event) => {
     EventBus.$emit('notification', {
       type: 'success',
       message: i18n.t('Account data has successfully been updated'),
-      action1: { label: 'OK', action: 'close' }
+      action1: { label: i18n.t('OK'), action: 'close' }
     })
     store.dispatch('user/refreshCurrentUser', event.result)
   }
 })
 
-EventBus.$on('session-after-started', (event) => { // example stock check callback
+EventBus.$on('session-after-authorized', (event) => { // example stock check callback
   console.log('Loading user profile')
-  store.dispatch('user/me', { refresh: navigator.onLine }, { root: true }).then((us) => {})
+  store.dispatch('user/me', { refresh: navigator.onLine }, { root: true }).then((us) => {}) // this will load user cart
   store.dispatch('user/getOrdersHistory', { refresh: navigator.onLine }, { root: true }).then((us) => {})
 })
 
@@ -74,6 +74,7 @@ export default {
   state: {
     token: '',
     current: null,
+    current_storecode: '',
     session_started: new Date(),
     newsletter: null,
     orders_history: null

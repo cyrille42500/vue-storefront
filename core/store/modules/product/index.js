@@ -13,7 +13,10 @@ export default {
     list: [],
     original: null, // default, not configured product
     related: {},
-    offlineImage: null
+    offlineImage: null,
+    current_custom_options: {},
+    current_bundle_options: {},
+    custom_options_validators: {}
   },
   getters,
   actions,

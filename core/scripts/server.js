@@ -3,6 +3,7 @@ const path = require('path')
 const express = require('express')
 const rootPath = require('app-root-path').path
 const resolve = file => path.resolve(rootPath, file)
+const config = require('config')
 
 const isProd = process.env.NODE_ENV === 'production'
 process.noDeprecation = true
@@ -51,10 +52,6 @@ app.use('/service-worker.js', serve('dist/service-worker.js', {
   setHeaders: {'Content-Type': 'text/javascript; charset=UTF-8'}
 }))
 
-app.use('/service-worker-ext.js', serve('dist/service-worker-ext.js', {
-  setHeaders: {'Content-Type': 'text/javascript; charset=UTF-8'}
-}))
-
 app.get('*', (req, res) => {
   if (!res.get('Content-Type')) {
     res.append('Content-Type', 'text/html')
@@ -87,13 +84,14 @@ app.get('*', (req, res) => {
     }
   }
 
-  renderer.renderToStream({ url: req.url })
+  renderer.renderToStream({ url: req.url, storeCode: req.header('x-vs-store-code') ? req.header('x-vs-store-code') : process.env.STORE_CODE }) // TODO: pass the store code from the headers
     .on('error', errorHandler)
     .on('end', () => console.log(`whole request: ${Date.now() - s}ms`))
     .pipe(res)
 })
 
-const port = process.env.PORT || 3000
-app.listen(port, () => {
-  console.log(`Vue Storefront Server started at http://localhost:${port}`)
+const port = process.env.PORT || config.server.port
+const host = process.env.HOST || config.server.host
+app.listen(port, host, () => {
+  console.log(`Vue Storefront Server started at http://${host}:${port}`)
 })

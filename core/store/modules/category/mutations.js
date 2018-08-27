@@ -1,7 +1,8 @@
 import * as types from '../../mutation-types'
-import { slugify } from 'core/helpers'
-import { entityKeyName } from 'core/lib/entities'
-import EventBus from 'core/plugins/event-bus'
+import { slugify, breadCrumbRoutes } from '../../helpers'
+import { entityKeyName } from '../../lib/entities'
+import EventBus from '../../lib/event-bus'
+import config from 'config'
 
 export default {
   [types.CATEGORY_UPD_CURRENT_CATEGORY] (state, category) {
@@ -10,6 +11,7 @@ export default {
   },
   [types.CATEGORY_UPD_CURRENT_CATEGORY_PATH] (state, path) {
     state.current_path = path // TODO: store to cache
+    state.breadcrumbs.routes = breadCrumbRoutes(state.current_path)
   },
 
   [types.CATEGORY_UPD_CATEGORIES] (state, categories) {
@@ -18,12 +20,12 @@ export default {
     for (let category of state.list) {
       let catSlugSetter = (category) => {
         for (let subcat of category.children_data) { // TODO: fixme and move slug setting to vue-storefront-api
-          subcat = Object.assign(subcat, { slug: subcat.hasOwnProperty('name') ? slugify(subcat.name) + '-' + subcat.id : '' })
+          subcat = Object.assign(subcat, { slug: (subcat.hasOwnProperty('url_key') && config.products.useMagentoUrlKeys) ? subcat.url_key : (subcat.hasOwnProperty('name') ? slugify(subcat.name) + '-' + subcat.id : '') })
           catSlugSetter(subcat)
         }
       }
       catSlugSetter(category)
-      const catCollection = global.db.categoriesCollection
+      const catCollection = global.$VS.db.categoriesCollection
       try {
         catCollection.setItem(entityKeyName('slug', category.slug.toLowerCase()), category).catch((reason) => {
           console.error(reason) // it doesn't work on SSR

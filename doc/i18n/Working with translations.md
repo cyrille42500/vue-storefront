@@ -1,6 +1,6 @@
 # Internationalization (i18n) of Vue Storefront
 
-Vue Storefront allows you to translate the whole UI using powerfull [vue-i18n](http://kazupon.github.io/vue-i18n/en/api.html#methods) library.
+Vue Storefront allows you to translate the whole UI using powerfull [vue-i18n](http://kazupon.github.io/vue-i18n/api/#methods) library.
 
 Please be aware of i18n issues while writing your own themes/extensions and keep the i18n support in mind, especially when creating Pull Requests to the core
 
@@ -13,7 +13,7 @@ When you're working with plain JS module you can simply use the translation help
     EventBus.$emit('notification', {
         type: 'success',
         message: i18n.t('Product has been added to the cart!'),
-        action1: { label: 'OK', action: 'close' }
+        action1: { label: i18n.t('OK'), action: 'close' }
     })
 ```
 
@@ -25,7 +25,7 @@ If you're working with *.vue components the matter is even simpler with Vue dire
     </span>
 ```
 
-For all helper methods and directives along with available parameters please do check the [vue-i18n documentation](http://kazupon.github.io/vue-i18n/en/api.html#methods).
+For all helper methods and directives along with available parameters please do check the [vue-i18n documentation](http://kazupon.github.io/vue-i18n/api/#methods).
 
 ## Working with translations
 

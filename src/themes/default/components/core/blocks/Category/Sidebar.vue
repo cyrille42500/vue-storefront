@@ -52,7 +52,7 @@
           context="category"
           :attribute_code="filter.attribute_code"
           class="price-select mb10 block"
-          code="price"
+          :code="filterIndex"
           v-for="(option, index) in filter"
           :key="index"
           :id="option.id"
@@ -78,12 +78,12 @@
 </template>
 
 <script>
-import { coreComponent } from 'core/lib/themes'
+import Sidebar from 'core/components/blocks/Category/Sidebar'
 
-import ColorSelector from '../../ColorSelector.vue'
-import SizeSelector from '../../SizeSelector.vue'
-import PriceSelector from '../../PriceSelector.vue'
-import GenericSelector from 'core/components/GenericSelector.vue'
+import ColorSelector from 'theme/components/core/ColorSelector'
+import SizeSelector from 'theme/components/core/SizeSelector'
+import PriceSelector from 'theme/components/core/PriceSelector'
+import GenericSelector from 'theme/components/core/GenericSelector'
 
 export default {
   components: {
@@ -92,6 +92,6 @@ export default {
     PriceSelector,
     GenericSelector
   },
-  mixins: [coreComponent('blocks/Category/Sidebar')]
+  mixins: [Sidebar]
 }
 </script>

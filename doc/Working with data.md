@@ -6,7 +6,7 @@ Vue storefront uses two primary data sources:
 
 ## Local data store
 
-You can access localForage repositories thru `Vue.$db` or `global.db` objects anywhere in the code BUT all data-related operations SHOULD be placed in Vuex stores.
+You can access localForage repositories thru `Vue.$db` or `global.$VS.db` objects anywhere in the code BUT all data-related operations SHOULD be placed in Vuex stores.
 
 Details on localForage API: http://localforage.github.io/localForage/ 
 
@@ -80,7 +80,7 @@ Vue.prototype.$db = {
   }))
 }
 
-global.db = Vue.prototype.$db // localForage instance
+global.$VS.db = Vue.prototype.$db // localForage instance
 ```
 
 ## Example Vuex store
@@ -89,8 +89,8 @@ Here you have example on how to the Vuex store should be constructed. Please not
 
 ```js
 import * as types from '../mutation-types'
-import { ValidationError } from 'core/lib/exceptions'
-import * as entities from 'core/lib/entities'
+import { ValidationError } from 'core/store/lib/exceptions'
+import * as entities from '../../lib/entities'
 import * as sw from 'core/lib/sw'
 import config from '../../config'
 const Ajv = require('ajv') // json validator
@@ -113,7 +113,7 @@ const actions = {
    */
   placeOrder ({ commit }, order) {
     const ajv = new Ajv()
-    const validate = ajv.compile(require('core/models/order.schema.json'))
+    const validate = ajv.compile(require('core/store/modules/order/order.schema.json'))
 
     if (!validate(order)) { // schema validation of upcoming order
       throw new ValidationError(validate.errors)
@@ -129,7 +129,7 @@ const mutations = {
    * @param {Object} product data format for products is described in /doc/ElasticSearch data formats.md
    */
   [types.CHECKOUT_PLACE_ORDER] (state, order) {
-    const ordersCollection = global.db.ordersCollection
+    const ordersCollection = global.$VS.db.ordersCollection
     const orderId = entities.uniqueEntityId(order) // timestamp as a order id is not the best we can do but it's enough
     order.order_id = orderId.toString()
     order.transmited = false
@@ -167,14 +167,14 @@ export default {
 
 Data formats for vue-storefront and vue-storefront-api are the same JSON files. There is Ajv validator (https://github.com/epoberezkin/ajv) used for validation.
 
-The convention is, that schemas are stored under `/src/models` - for example [Order schema](https://github.com/DivanteLtd/vue-storefront/blob/master/core/models/order.schema.json).
+The convention is, that schemas are stored under `/core/store/modules/<module-name>/<model-name>.schema.json` - for example [Order schema](https://github.com/DivanteLtd/vue-storefront/blob/master/core/store/modules/order/order.schema.json).
 
 Validation of objects is rather straight forward:
 
 ```js
     const Ajv = require('ajv') // json validator
     const ajv = new Ajv()
-    const validate = ajv.compile(require('core/models/order.schema.json'))
+    const validate = ajv.compile(require('core/store/modules/order/order.schema.json'))
 
     if (!validate(order)) { // schema validation of upcoming order
       throw new ValidationError(validate.errors)
@@ -195,7 +195,7 @@ Validation errors format:
 `Orders` repository stores all orders transmitted and *to be transmitted* (aka. order queue) used by service worker.
 ![Orders data format as seen on Developers Tools](media/orders-localstorage.png)
 
-Here you have a validation schema for order: https://github.com/DivanteLtd/vue-storefront/blob/master/core/models/order.schema.json
+Here you have a validation schema for order: https://github.com/DivanteLtd/vue-storefront/blob/master/core/store/modules/order/order.schema.json
 
 ```json
 {

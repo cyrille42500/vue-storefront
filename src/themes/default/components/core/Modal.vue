@@ -1,14 +1,23 @@
 <template>
   <transition name="fade-in-down">
-    <div class="modal"
-         v-if="isVisible"
-         ref="modal"
-         @click.self="close">
+    <div
+      class="modal"
+      v-if="isVisible"
+      ref="modal"
+      @click.self="close"
+    >
       <div class="modal-wrapper">
         <div class="modal-center">
           <div class="modal-container bg-cl-primary" ref="modal-content" :style="style">
             <header class="modal-header py25 px65 h1 serif weight-700 bg-cl-secondary" v-if="$slots.header">
-              <i slot="close" class="modal-close material-icons p15 cl-bg-tertiary" @click="close">close</i>
+              <i
+                slot="close"
+                class="modal-close material-icons p15 cl-bg-tertiary"
+                @click="close"
+                data-testid="closeModalButton"
+              >
+                close
+              </i>
               <slot name="header"/>
             </header>
             <div class="modal-content pt30 pb60 px65" v-if="$slots.content || staticData">
@@ -24,12 +33,14 @@
 </template>
 
 <script>
-import { coreComponent } from 'core/lib/themes'
-import staticContent from 'theme/components/theme/StaticContent'
+import StaticContent from 'theme/components/theme/StaticContent'
+import Modal from 'core/components/Modal'
 
 export default {
-  mixins: [coreComponent('Modal')],
-  components: { staticContent },
+  components: {
+    StaticContent
+  },
+  mixins: [Modal],
   props: {
     staticData: {
       type: String,

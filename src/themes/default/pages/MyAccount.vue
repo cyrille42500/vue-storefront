@@ -18,7 +18,7 @@
           <nav class="static-menu serif h4 mb35">
             <ul class="m0 p0">
               <li class="mb20" v-for="(page, index) in navigation" :key="index" @click="notify(page.title)">
-                <router-link :to="page.link" class="cl-accent">{{ page.title }}</router-link>
+                <router-link :to="localizedRoute(page.link)" class="cl-accent">{{ page.title }}</router-link>
               </li>
             </ul>
           </nav>
@@ -32,15 +32,28 @@
 </template>
 
 <script>
-import { corePage } from 'core/lib/themes'
+import MyAccount from 'core/pages/MyAccount'
 import Breadcrumbs from '../components/core/Breadcrumbs'
 import MyProfile from '../components/core/blocks/MyAccount/MyProfile'
 import MyShippingDetails from '../components/core/blocks/MyAccount/MyShippingDetails'
 import MyNewsletter from '../components/core/blocks/MyAccount/MyNewsletter'
 import MyOrders from '../components/core/blocks/MyAccount/MyOrders'
 import MyOrder from '../components/core/blocks/MyAccount/MyOrder'
+import i18n from 'core/lib/i18n'
 
 export default {
+  data () {
+    return {
+      navigation: [
+        { title: i18n.t('My profile'), link: '/my-account' },
+        { title: i18n.t('My shipping details'), link: '/my-account/shipping-details' },
+        { title: i18n.t('My newsletter'), link: '/my-account/newsletter' },
+        { title: i18n.t('My orders'), link: '/my-account/orders' },
+        { title: i18n.t('My loyalty card'), link: '#' },
+        { title: i18n.t('My product reviews'), link: '#' }
+      ]
+    }
+  },
   components: {
     Breadcrumbs,
     MyProfile,
@@ -49,7 +62,7 @@ export default {
     MyOrders,
     MyOrder
   },
-  mixins: [corePage('MyAccount')]
+  mixins: [MyAccount]
 }
 </script>
 

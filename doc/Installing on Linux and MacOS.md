@@ -25,7 +25,7 @@ yarn
 yarn installer
 ```
 
-After answering some questions precess would start automatically. Enjoy :)
+After answering some questions the process will start automatically. Enjoy :)
 
 
 ## Manual installation
@@ -49,7 +49,7 @@ cp config/default.json config/local.json
 nano config/local.json
 ```
 The config file is quite simple, but here you have some comments: [Config file for vue-storefront](https://github.com/DivanteLtd/vue-storefront/wiki/Config-file-format-for-vue-storefront).
-We re using powerfull node.js library for config files, check the docs to learn more on it: https://github.com/lorenwest/node-config.
+We re using powerful node.js library for config files, check the docs to learn more on it: https://github.com/lorenwest/node-config.
 
 To import these products we'll use 'elasticdump' - which is provided by default with package.json dependencies and yarn command:
 
@@ -72,7 +72,7 @@ yarn dev
 
 You can check if everything works just fine by executing the following command:
 ```
-curl -i http://localhost:8080/catalog/vue_storefront_catalog/product/_search?q=bag&size=50&from=0
+curl -i http://localhost:8080/api/catalog/vue_storefront_catalog/product/_search?q=bag&size=50&from=0
 ```
 
 ### Install the vue-storefront

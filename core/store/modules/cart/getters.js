@@ -1,5 +1,5 @@
-import _ from 'lodash'
-import i18n from 'core/lib/i18n'
+import sumBy from 'lodash-es/sumBy'
+import i18n from '../../lib/i18n'
 
 export default {
   totals (state) {
@@ -13,7 +13,7 @@ export default {
           {
             code: 'subtotalInclTax',
             title: i18n.t('Subtotal incl. tax'),
-            value: _.sumBy(state.cartItems, (p) => {
+            value: sumBy(state.cartItems, (p) => {
               return p.qty * p.priceInclTax
             })
           },
@@ -30,7 +30,7 @@ export default {
           {
             code: 'grand_total',
             title: i18n.t('Grand total'),
-            value: _.sumBy(state.cartItems, (p) => {
+            value: sumBy(state.cartItems, (p) => {
               return p.qty * p.priceInclTax + shipping.price_incl_tax
             })
           }
@@ -41,22 +41,8 @@ export default {
     }
   },
   totalQuantity (state) {
-    return _.sumBy(state.cartItems, (p) => {
+    return sumBy(state.cartItems, (p) => {
       return p.qty
     })
-  },
-  shippingMethods (state) {
-    if (state.shipping instanceof Array) {
-      return state.shipping
-    } else {
-      return [state.shipping]
-    }
-  },
-  paymentMethods (state) {
-    if (state.payment instanceof Array) {
-      return state.payment
-    } else {
-      return [state.payment]
-    }
   }
 }

@@ -2,20 +2,20 @@ const path = require('path')
 const config = require('config')
 const fs = require('fs')
 const CaseSensitivePathsPlugin = require('case-sensitive-paths-webpack-plugin')
+const VueLoaderPlugin = require('vue-loader/lib/plugin')
+const autoprefixer = require('autoprefixer')
 
 fs.writeFileSync(
   path.resolve(__dirname, './config.json'),
   JSON.stringify(config)
 )
 
-const vueConfig = require('./vue-loader.config')
-const appConfig = require('./config.json')
-
 const extensionsRoot = '../../src/extensions'
 const themesRoot = '../../src/themes'
 
 const themeRoot = require('./theme-path')
 const themeComponents = themeRoot + '/components'
+const themeExtensions = themeRoot + '/extensions'
 const themePages = themeRoot + '/pages'
 const themePlugins = themeRoot + '/plugins'
 const themeFilters = themeRoot + '/filters'
@@ -25,14 +25,33 @@ const themeStores = themeRoot + '/store'
 const themeCSS = themeRoot + '/css'
 const themeApp = themeRoot + '/App.vue'
 
+const postcssConfig =  {
+  loader: 'postcss-loader',
+  options: {
+    ident: 'postcss',
+    plugins: (loader) => [
+      require('postcss-flexbugs-fixes'),
+      require('autoprefixer')({
+        flexbox: 'no-2009',
+      }),
+    ]
+  }
+};
+
 module.exports = {
   plugins: [
-    new CaseSensitivePathsPlugin()
+    new CaseSensitivePathsPlugin(),
+    new VueLoaderPlugin()
   ],
-  devtool: '#source-map',
+  devtool: 'source-map',
   entry: {
     app: './core/client-entry.js',
-    vendor: ['vue', 'vue-router', 'vuex', 'vuex-router-sync', 'axios']
+    vendor: ['vue', 'vue-router', 'vuex', 'vuex-router-sync']
+  },
+  output: {
+    path: path.resolve(__dirname, '../../dist'),
+    publicPath: '/dist/',
+    filename: '[name].[hash].js'
   },
   resolveLoader: {
     modules: [
@@ -68,7 +87,9 @@ module.exports = {
       'core/plugins': path.resolve(__dirname, '../plugins'),
       'core/resource': path.resolve(__dirname, '../resource'),
       'core/router': path.resolve(__dirname, '../router'),
-      'core/store': path.resolve(__dirname, '../store'),
+      'core/directives': path.resolve(__dirname, '../directives'),
+      // Ccre API Modules
+      'core/api/cart': path.resolve(__dirname, '../api/cart/index.js'),
       // Theme aliases
       'theme': themeRoot,
       'theme/app': themeApp,
@@ -79,25 +100,26 @@ module.exports = {
       'theme/pages': themePages,
       'theme/plugins': themePlugins,
       'theme/resource': themeResources,
-      'theme/store': themeStores
+      'theme/store': themeStores,
+      'theme/extensions': themeExtensions
     }
   },
-  output: {
-    path: path.resolve(__dirname, '../../dist'),
-    publicPath: '/dist/',
-    filename: '[name].[hash].js'
-  },
   module: {
-    rules: [{
-      enforce: 'pre',
-      test: /\.(js|vue)$/,
-      loader: 'eslint-loader',
-      exclude: /node_modules/
-    },
+    rules: [
+      {
+        enforce: 'pre',
+        test: /\.(js|vue)$/,
+        loader: 'eslint-loader',
+        exclude: [/node_modules/, /test/]
+      },
       {
         test: /\.vue$/,
         loader: 'vue-loader',
-        options: vueConfig,
+        options: {
+          optimizeSSR: false,
+          preserveWhitespace: false,
+          postcss: [autoprefixer()],
+        }
       },
       {
         test: /\.js$/,
@@ -112,20 +134,51 @@ module.exports = {
         }
       },
       {
-        test: /\.s[a|c]ss$/,
-        loader: 'style!css!sass'
+        test: /\.css$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          postcssConfig
+        ]
+      },
+      {
+        test: /\.scss$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          postcssConfig,
+          'sass-loader'
+        ]
+      },
+      {
+        test: /\.sass$/,
+        use: [
+          'vue-style-loader',
+          'css-loader',
+          postcssConfig,
+          {
+            loader: 'sass-loader',
+            options: {
+              indentedSyntax: true
+            }
+          }
+        ]
       },
       {
         test: /\.md$/,
-        loader: 'vue-markdown-loader',
-        options: {
-          wrapper: 'div'
-        }
+        use: [
+          'vue-loader',
+          {
+            loader: 'markdown-to-vue-loader',
+            options: {
+              componentWrapper: 'div'
+            }
+          }
+        ]
       },
       {
         test: path.resolve(__dirname, '../lib/translation.preprocessor.js'),
         use: [
-          { loader: 'json-loader' },
           {
             loader: 'val-loader',
             options: {
@@ -136,6 +189,10 @@ module.exports = {
             }
           }
         ]
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf)(\?.*$|$)/,
+        loader: 'url-loader?importLoaders=1&limit=10000'
       }
     ]
   }

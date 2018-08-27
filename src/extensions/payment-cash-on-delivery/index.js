@@ -12,7 +12,7 @@ export default function (app, router, store, config) {
   store.registerModule(EXTENSION_KEY, extensionStore) // add custom store
 
   app.$on('application-after-init', () => {
-    console.log(EXTENSION_KEY + ' extension initialised')
+    console.debug(EXTENSION_KEY + ' extension initialised')
   })
 
   // Add this payment method to the config.
@@ -25,7 +25,7 @@ export default function (app, router, store, config) {
     'offline': true
   }
 
-  app.$store.state.payment.methods.push(paymentMethodConfig)
+  app.$store.dispatch('payment/addMethod', paymentMethodConfig)
 
   // Mount the info component when required.
   EventBus.$on('checkout-payment-method-changed', (paymentMethodCode) => {
